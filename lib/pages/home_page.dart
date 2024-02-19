@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
           leading: IconButton(
               onPressed: () =>
                   Provider.of<Authn>(context, listen: false).logOut(),
-              icon: Icon(Icons.logout)),
+              icon: const Icon(Icons.logout)),
           title: const Text('Daftar Whatsapp'),
           actions: [
             IconButton(

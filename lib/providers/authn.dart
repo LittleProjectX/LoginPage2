@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class Authn with ChangeNotifier {
+  Timer? _autoTimer;
   String? _idToken, userId;
   DateTime? _expireDate;
 
@@ -52,6 +54,7 @@ class Authn with ChangeNotifier {
       tempuserId = responStat['localId'];
       _tempexpireDate = DateTime.now()
           .add(Duration(seconds: int.parse(responStat['expiresIn'])));
+      _autoLogout();
       notifyListeners();
     } catch (e) {
       rethrow;
@@ -79,6 +82,7 @@ class Authn with ChangeNotifier {
       tempuserId = responStat['localId'];
       _tempexpireDate = DateTime.now()
           .add(Duration(seconds: int.parse(responStat['expiresIn'])));
+      _autoLogout();
       notifyListeners();
     } catch (e) {
       rethrow;
@@ -89,6 +93,21 @@ class Authn with ChangeNotifier {
     _idToken = null;
     userId = null;
     _expireDate = null;
+    if (_autoTimer != null) {
+      _autoTimer!.cancel();
+      _autoTimer = null;
+    }
     notifyListeners();
+  }
+
+  void _autoLogout() {
+    if (_autoTimer != null) {
+      _autoTimer!.cancel();
+    }
+    final timeToExpire = _tempexpireDate!.difference(DateTime.now()).inSeconds;
+    print(timeToExpire);
+    _autoTimer = Timer(Duration(seconds: timeToExpire), () {
+      logOut();
+    });
   }
 }
