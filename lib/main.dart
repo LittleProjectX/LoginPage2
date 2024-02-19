@@ -31,7 +31,21 @@ class MyApp extends StatelessWidget {
       child: Consumer<Authn>(
         builder: (context, getAuth, child) => MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: getAuth.isAuth ? const HomePage() : const LoginPage(),
+          home: getAuth.isAuth
+              ? const HomePage()
+              : FutureBuilder(
+                  future: getAuth.autoLogin(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Scaffold(
+                        body: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    return const LoginPage();
+                  },
+                ),
           routes: {
             HomePage.nameRoute: (context) => const HomePage(),
             AddPage.nameRoute: (context) => const AddPage(),
